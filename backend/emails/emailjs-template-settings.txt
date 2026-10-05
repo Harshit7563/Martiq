@@ -1,0 +1,22 @@
+EmailJS dashboard setup (required once)
+======================================
+
+1) https://dashboard.emailjs.com/admin → Email Services
+   - Connect Gmail / Outlook / etc.
+   - Copy Service ID (e.g. service_xxxxxxx)
+   - Or use default_service after setting a default service
+
+2) Email Templates → Create New Template
+   - To Email: {{to_email}}
+   - Subject: Your Martiq OTP: {{passcode}}
+   - Content: paste HTML from backend/emails/otp.html
+   - Variables used: {{passcode}} {{time}} {{name}} {{to_email}} {{email}}
+   - Copy Template ID (e.g. template_xxxxxxx)
+
+3) Account → Security
+   - Allow EmailJS API for non-browser applications: ON
+   - (Optional) Use Private Key authorization: ON
+
+4) Put IDs in backend/.env:
+   EMAILJS_SERVICE_ID=service_xxxxxxx
+   EMAILJS_TEMPLATE_ID=template_xxxxxxx
