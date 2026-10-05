@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, Navigate } from 'react-router-dom'
+import { useAuth } from '@/auth/AuthContext'
 import { useCart } from '@/cart/CartContext'
 import { formatINR } from '@/lib/format'
 import { Pill } from '@/components/Pill'
@@ -56,6 +57,7 @@ function Field({
 }
 
 export function CheckoutPage() {
+  const auth = useAuth()
   const cart = useCart()
   const [step, setStep] = useState<Step>('address')
   const [panel, setPanel] = useState<PayPanel>('upi')
@@ -92,6 +94,16 @@ export function CheckoutPage() {
   const total = cart.subtotal + shipping
   const codAllowed = total > 500
 
+  useEffect(() => {
+    if (!auth.user) return
+    setName((prev) => prev || auth.user!.name)
+    setEmail((prev) => prev || auth.user!.email)
+  }, [auth.user])
+
+  if (!auth.isSignedIn) {
+    return <Navigate to="/login?returnUrl=%2Fcheckout" replace />
+  }
+
   async function onPincodeChange(raw: string) {
     const next = raw.replace(/\D/g, '').slice(0, 6)
     setPincode(next)
@@ -121,6 +133,11 @@ export function CheckoutPage() {
     pincode.replace(/\D/g, '').length === 6
 
   function confirmOrder(methodLabel: string) {
+    if (!auth.isSignedIn) {
+      setProcessing(false)
+      setPayError('Please sign in to place your order.')
+      return
+    }
     setPaidTotal(total)
     setOrderId(`MARTIQ-${Math.floor(100000 + Math.random() * 900000)}`)
     setPlaced(true)

@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useAuth } from '@/auth/AuthContext'
 import { useCart } from '@/cart/CartContext'
 import { formatINR } from '@/lib/format'
 
 export function CartPage() {
+  const auth = useAuth()
   const cart = useCart()
+  const checkoutHref = auth.isSignedIn
+    ? '/checkout'
+    : '/login?returnUrl=%2Fcheckout'
 
   if (cart.items.length === 0) {
     return (
@@ -78,8 +83,11 @@ export function CartPage() {
           <div className="text-sm text-neutral-600">Subtotal</div>
           <div className="mt-1 text-2xl font-semibold text-neutral-900">₹{formatINR(cart.subtotal)}</div>
           <p className="mt-2 text-xs text-neutral-500">Shipping calculated at checkout.</p>
-          <Link to="/checkout" className="mq-btn-primary mt-6 w-full">
-            Checkout
+          {!auth.isSignedIn ? (
+            <p className="mt-3 text-xs text-mq-muted">Sign in required to place an order.</p>
+          ) : null}
+          <Link to={checkoutHref} className="mq-btn-primary mt-6 w-full">
+            {auth.isSignedIn ? 'Checkout' : 'Sign in to checkout'}
           </Link>
           <button
             type="button"
