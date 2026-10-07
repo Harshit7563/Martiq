@@ -53,7 +53,8 @@ export function GoogleSignInButton({
           },
           auto_select: false,
           cancel_on_tap_outside: true,
-          use_fedcm_for_prompt: true,
+          // FedCM is flaky on some browsers/hosts; classic GIS prompt is more reliable.
+          use_fedcm_for_prompt: false,
         })
 
         hostRef.current.innerHTML = ''
